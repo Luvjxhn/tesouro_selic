@@ -17,6 +17,13 @@ st.sidebar.header("Parâmetros do Investimento")
 # Input do valor inicial
 valor_inicial = st.sidebar.number_input("Valor Inicial (R$)", min_value=100.0, value=1000.0, step=50.0)
 
+#input meses adicionais
+dinheiromes = ()
+if st.sidebar.checkbox("Adicionar mais de 1 mês"):
+    quantidade_de_meses = st.sidebar.number_input("Quantidade de meses que deseja inserir", min_value=1, value=1, step=1)
+    for x in range(quantidade_de_meses):
+        valor_mes = st.sidebar.number_input(f"Valor inserido mes {x+1} (R$)", min_value=100.0, value=1000.0, step=50.0)
+
 # Input da taxa Selic anual
 taxa_selic_anual = st.sidebar.slider("Taxa Selic Anual (%)", min_value=0.0, max_value=20.0, value=12.75, step=0.25)
 
@@ -66,18 +73,20 @@ st.altair_chart(chart, use_container_width=True)
 # Comparação de cenários
 if st.sidebar.checkbox("Comparar múltiplos cenários"):
     quantidade_de_cenarios = st.sidebar.number_input("Quantos cenários deseja adicionar?", min_value=1, value=1, step=1)
-    for i in range(1,quantidade_de_cenarios): #integrador de quantidade de cenarios
+    for i in range(quantidade_de_cenarios): #integrador de quantidade de cenarios
         taxa_selic_anual_2 = st.sidebar.slider(f"Taxa Selic Anual (Cenário {i}) (%)", min_value=0.0, max_value=20.0, value=10.0, step=0.25)
         taxa_mensal_2 = (1 + taxa_selic_anual_2 / 100) ** (1 / 12) - 1
         valores_2 = [valor_inicial * ((1 + taxa_mensal_2) ** mes) for mes in meses]
+        
 
-        df[f"Saldo (Cenário {i}) (R$)"] = valores_2
 
-        st.write("### Comparação de Cenários")
-        st.write(f"### cenario {i}")
-        st.line_chart(df.set_index("Mês"))
+        df[f"Saldo (Cenário {i+1}) (R$)"] = valores_2
+
+    st.write(f"### Cenario criado")
+    st.line_chart(df.set_index("Mês"))
 
 # Exibir a tabela completa
+
 st.subheader("Tabela de Evolução Mensal")
 st.dataframe(df.style.format({"Saldo (R$)": "R${:,.2f}"}))
 
