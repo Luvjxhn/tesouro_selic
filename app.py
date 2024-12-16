@@ -65,14 +65,17 @@ st.altair_chart(chart, use_container_width=True)
 
 # Comparação de cenários
 if st.sidebar.checkbox("Comparar múltiplos cenários"):
-    taxa_selic_anual_2 = st.sidebar.slider("Taxa Selic Anual (Cenário 2) (%)", min_value=0.0, max_value=20.0, value=10.0, step=0.25)
-    taxa_mensal_2 = (1 + taxa_selic_anual_2 / 100) ** (1 / 12) - 1
-    valores_2 = [valor_inicial * ((1 + taxa_mensal_2) ** mes) for mes in meses]
+    quantidade_de_cenarios = st.sidebar.number_input("Quantos cenários deseja adicionar?", min_value=1, value=1, step=1)
+    for i in range(1,quantidade_de_cenarios): #integrador de quantidade de cenarios
+        taxa_selic_anual_2 = st.sidebar.slider(f"Taxa Selic Anual (Cenário {i}) (%)", min_value=0.0, max_value=20.0, value=10.0, step=0.25)
+        taxa_mensal_2 = (1 + taxa_selic_anual_2 / 100) ** (1 / 12) - 1
+        valores_2 = [valor_inicial * ((1 + taxa_mensal_2) ** mes) for mes in meses]
 
-    df["Saldo (Cenário 2) (R$)"] = valores_2
+        df[f"Saldo (Cenário {i}) (R$)"] = valores_2
 
-    st.write("### Comparação de Cenários")
-    st.line_chart(df.set_index("Mês"))
+        st.write("### Comparação de Cenários")
+        st.write(f"### cenario {i}")
+        st.line_chart(df.set_index("Mês"))
 
 # Exibir a tabela completa
 st.subheader("Tabela de Evolução Mensal")
